@@ -412,8 +412,8 @@ export function TradesList({ trades, onBack, onDeleteTrade, type }) {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
               {sortedTrades.map((trade) => (
                 <motion.div
-                  key={trade.id}
-                  layoutId={`trade-${trade.id}`}
+                  key={trade._id}
+                  layoutId={`trade-${trade._id}`}
                   className="bg-gray-800/50 rounded-xl overflow-hidden group relative max-w-sm"
                 >
                   {trade.image && (
@@ -448,7 +448,7 @@ export function TradesList({ trades, onBack, onDeleteTrade, type }) {
                         Details anzeigen →
                       </button>
                       <Button
-                        onClick={() => setDeleteConfirm(trade.id)}
+                        onClick={() => setDeleteConfirm(trade._id)}
                         variant="danger"
                         className="opacity-0 group-hover:opacity-100 transition-opacity !px-2 !py-1 text-xs"
                       >
@@ -457,14 +457,14 @@ export function TradesList({ trades, onBack, onDeleteTrade, type }) {
                     </div>
                   </div>
 
-                  {deleteConfirm === trade.id && (
+                  {deleteConfirm === trade._id && (
                     <div className="absolute inset-0 bg-gray-900/95 flex items-center justify-center">
                       <div className="text-center">
                         <p className="mb-4">Trade wirklich löschen?</p>
                         <div className="flex gap-2 justify-center">
                           <Button
                             onClick={() => {
-                              onDeleteTrade(trade.id);
+                              onDeleteTrade(trade._id);
                               setDeleteConfirm(null);
                             }}
                             variant="danger"
