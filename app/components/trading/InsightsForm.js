@@ -1,5 +1,5 @@
 "use client";
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useInsightApi } from '@/app/hooks/useInsightApi';
 import { Button } from '../ui/Button';
 import { PageContainer } from '../ui/PageContainer';
@@ -31,8 +31,10 @@ export function InsightsForm({ onBack }) {
   const [selectedInsight, setSelectedInsight] = useState(null);
 
   useEffect(() => {
-    loadInsights();
-  }, []);
+    if (showSaved) {
+      loadInsights();
+    }
+  }, [showSaved]);
 
   const loadInsights = async () => {
     try {
@@ -276,7 +278,7 @@ export function InsightsForm({ onBack }) {
           </div>
         )}
 
-        <form onSubmit={handleSubmit} className="space-y-4 mb-8">
+        <form onSubmit={handleSubmit} className="space-y-4">
           <div className="bg-gray-800/50 backdrop-blur-lg rounded-xl p-6 shadow-lg space-y-4">
             <input
               type="text"
@@ -342,31 +344,6 @@ export function InsightsForm({ onBack }) {
             </Button>
           </div>
         </form>
-
-        <div className="space-y-4">
-          <h2 className="text-xl font-semibold mb-4">Gespeicherte Erkenntnisse</h2>
-          {insights.map((insight) => (
-            <div key={insight._id} className="p-4 bg-gray-700/30 rounded-lg">
-              <div className="flex justify-between items-start">
-                <div>
-                  <h3 className="text-lg font-semibold">{insight.title}</h3>
-                  <p className="text-sm text-gray-400">{insight.date}</p>
-                  <p className="mt-2">{insight.text}</p>
-                  {insight.image && (
-                    <img src={insight.image} alt="Insight" className="mt-2 rounded-lg max-w-sm" />
-                  )}
-                </div>
-                <Button
-                  onClick={() => handleDelete(insight._id)}
-                  variant="danger"
-                  className="!px-2 !py-1 text-sm"
-                >
-                  Löschen
-                </Button>
-              </div>
-            </div>
-          ))}
-        </div>
       </div>
     </PageContainer>
   );

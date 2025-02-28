@@ -16,7 +16,12 @@ const tradeSchema = new mongoose.Schema({
   image: String,
   weeklyBias: String,
   dailyBias: String,
-  type: { type: String, required: true, enum: ['realTime', 'barReplay'] }
+  type: { type: String, required: true, enum: ['realTime', 'barReplay'] },
+  userId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+    required: true
+  }
 }, {
   timestamps: true
 });
