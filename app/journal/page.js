@@ -5,7 +5,6 @@ import { RealTimeTrading } from '../components/trading/RealTimeTrading';
 import { BarReplayTrading } from '../components/trading/BarReplayTrading';
 import { InsightsForm } from '../components/trading/InsightsForm';
 import { TradingCalendar } from '../components/trading/TradingCalendar';
-import { useLocalStorage } from '../hooks/useLocalStorage';
 import { QuoteDisplay } from '../components/ui/QuoteDisplay';
 import { motion } from "framer-motion";
 import { PageContainer } from "../components/ui/PageContainer";
@@ -20,29 +19,12 @@ const quotes = [
 ];
 
 export default function TradingJournal() {
-  const [mode, setMode] = useState(null);
-  const [realTimeTrades, setRealTimeTrades] = useLocalStorage('real-time-trades', []);
-  const [barReplayTrades, setBarReplayTrades] = useLocalStorage('bar-replay-trades', []);
-  const [insights, setInsights] = useLocalStorage('insights', []);
-  const [randomQuote, setRandomQuote] = useState(quotes[Math.floor(Math.random() * quotes.length)]);
   const [view, setView] = useState('main');
+  const [randomQuote, setRandomQuote] = useState('');
 
-  // Neue Handler-Funktionen für das Speichern
-  const handleSaveRealTimeTrade = (trade) => {
-    setRealTimeTrades(prevTrades => [...prevTrades, { ...trade, id: Date.now() }]);
-  };
-
-  const handleSaveBarReplayTrade = (trade) => {
-    setBarReplayTrades(prevTrades => [...prevTrades, { ...trade, id: Date.now() }]);
-  };
-
-  const handleDeleteRealTimeTrade = (tradeId) => {
-    setRealTimeTrades(prevTrades => prevTrades.filter(trade => trade.id !== tradeId));
-  };
-
-  const handleDeleteBarReplayTrade = (tradeId) => {
-    setBarReplayTrades(prevTrades => prevTrades.filter(trade => trade.id !== tradeId));
-  };
+  useEffect(() => {
+    setRandomQuote(quotes[Math.floor(Math.random() * quotes.length)]);
+  }, []);
 
   if (view === 'main') {
     return (
@@ -96,15 +78,6 @@ export default function TradingJournal() {
                   borderColor: "border-purple-500/20"
                 },
                 {
-                  title: "Trading Kalender",
-                  description: "Verfolge deine tägliche Performance",
-                  icon: "📅",
-                  view: "calendar",
-                  color: "from-emerald-500/10 to-emerald-600/10",
-                  hoverColor: "hover:from-emerald-500/20 hover:to-emerald-600/20",
-                  borderColor: "border-emerald-500/20"
-                },
-                {
                   title: "Trading Erkenntnisse",
                   description: "Dokumentiere deine Learnings",
                   icon: "💡",
@@ -112,6 +85,15 @@ export default function TradingJournal() {
                   color: "from-amber-500/10 to-amber-600/10",
                   hoverColor: "hover:from-amber-500/20 hover:to-amber-600/20",
                   borderColor: "border-amber-500/20"
+                },
+                {
+                  title: "Trading Kalender",
+                  description: "Verfolge deine tägliche Performance",
+                  icon: "📅",
+                  view: "calendar",
+                  color: "from-emerald-500/10 to-emerald-600/10",
+                  hoverColor: "hover:from-emerald-500/20 hover:to-emerald-600/20",
+                  borderColor: "border-emerald-500/20"
                 }
               ].map((button, index) => (
                 <motion.div
@@ -152,27 +134,10 @@ export default function TradingJournal() {
 
   // Aktualisierte components mit korrekten Props
   const components = {
-    realTime: (
-      <RealTimeTrading 
-        onSubmit={handleSaveRealTimeTrade}
-        trades={realTimeTrades}
-        onDeleteTrade={handleDeleteRealTimeTrade}
-        onBack={() => setView('main')} 
-      />
-    ),
-    barReplay: (
-      <BarReplayTrading 
-        onSubmit={handleSaveBarReplayTrade}
-        trades={barReplayTrades}
-        onDeleteTrade={handleDeleteBarReplayTrade}
-        onBack={() => setView('main')} 
-      />
-    ),
-    insights: <InsightsForm insights={insights} onSave={setInsights} onBack={() => setView('main')} />,
-    calendar: <TradingCalendar
-      trades={realTimeTrades}
-      onBack={() => setView('main')}
-    />
+    realTime: <RealTimeTrading onBack={() => setView('main')} />,
+    barReplay: <BarReplayTrading onBack={() => setView('main')} />,
+    insights: <InsightsForm onBack={() => setView('main')} />,
+    calendar: <TradingCalendar onBack={() => setView('main')} />
   };
 
   return components[view] || null;

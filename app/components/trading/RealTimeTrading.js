@@ -1,10 +1,11 @@
 "use client";
 import { useTradeForm } from '@/app/hooks/useTradeForm';
+import { useTradeApi } from '@/app/hooks/useTradeApi';
+import { useState, useEffect } from 'react';
 import { Button } from '../ui/Button';
 import { Input } from '../ui/Input';
 import { Select } from '../ui/Select';
 import { PageContainer } from '../ui/PageContainer';
-import { useState } from 'react';
 import { TradesList } from './TradesList';
 import { TradingCalendar } from './TradingCalendar';
 
@@ -24,9 +25,10 @@ const initialState = {
   image: "",
   weeklyBias: "",
   dailyBias: "",
+  type: "realTime" // Wichtig: Typ des Trades festlegen
 };
 
-export function RealTimeTrading({ onSubmit, trades, onDeleteTrade, onBack }) {
+export function RealTimeTrading({ onBack }) {
   const {
     formData,
     handleChange,
@@ -35,20 +37,46 @@ export function RealTimeTrading({ onSubmit, trades, onDeleteTrade, onBack }) {
     resetForm
   } = useTradeForm(initialState);
 
+  const { saveTrade, fetchTrades, deleteTrade, isLoading, error } = useTradeApi();
+  const [trades, setTrades] = useState([]);
   const [saveSuccess, setSaveSuccess] = useState(false);
   const [showTrades, setShowTrades] = useState(false);
   const [showCalendar, setShowCalendar] = useState(false);
 
-  const handleSubmit = (e) => {
+  // Trades beim ersten Laden abrufen
+  useEffect(() => {
+    loadTrades();
+  }, []);
+
+  const loadTrades = async () => {
+    try {
+      const data = await fetchTrades();
+      // Nur RealTime Trades filtern
+      setTrades(data.filter(trade => trade.type === 'realTime'));
+    } catch (error) {
+      console.error('Fehler beim Laden der Trades:', error);
+    }
+  };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      onSubmit(formData);
+      await saveTrade(formData);
       resetForm();
       setSaveSuccess(true);
-      setTimeout(() => setSaveSuccess(false), 3000); // Nachricht verschwindet nach 3 Sekunden
+      loadTrades(); // Trades neu laden
+      setTimeout(() => setSaveSuccess(false), 3000);
     } catch (error) {
       console.error('Fehler beim Speichern:', error);
-      // Hier könnte man auch eine Fehlermeldung anzeigen
+    }
+  };
+
+  const handleDeleteTrade = async (id) => {
+    try {
+      await deleteTrade(id);
+      loadTrades(); // Liste aktualisieren
+    } catch (error) {
+      console.error('Fehler beim Löschen:', error);
     }
   };
 
@@ -56,8 +84,9 @@ export function RealTimeTrading({ onSubmit, trades, onDeleteTrade, onBack }) {
     return <TradesList 
       trades={trades} 
       onBack={() => setShowTrades(false)} 
-      onDeleteTrade={onDeleteTrade}
-      type="realTime" 
+      onDeleteTrade={handleDeleteTrade}
+      type="realTime"
+      isLoading={isLoading}
     />;
   }
 
@@ -85,9 +114,21 @@ export function RealTimeTrading({ onSubmit, trades, onDeleteTrade, onBack }) {
           <div className="w-20"></div> {/* Spacer für symmetrisches Layout */}
         </div>
 
+        {isLoading && (
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+          </div>
+        )}
+        
+        {error && (
+          <div className="bg-red-500/10 border border-red-500 text-red-500 p-4 rounded-lg mb-4">
+            {error}
+          </div>
+        )}
+        
         {saveSuccess && (
-          <div className="fixed top-4 right-4 bg-green-500 text-white px-4 py-2 rounded shadow-lg">
-            Trade erfolgreich gespeichert! ✅
+          <div className="bg-green-500/10 border border-green-500 text-green-500 p-4 rounded-lg mb-4">
+            Trade erfolgreich gespeichert!
           </div>
         )}
 

@@ -1,10 +1,11 @@
 "use client";
 import { useTradeForm } from '@/app/hooks/useTradeForm';
+import { useTradeApi } from '@/app/hooks/useTradeApi';
 import { Button } from '../ui/Button';
 import { Input } from '../ui/Input';
 import { Select } from '../ui/Select';
 import { PageContainer } from '../ui/PageContainer';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { TradesList } from './TradesList';
 
 const initialState = {
@@ -23,9 +24,10 @@ const initialState = {
   image: "",
   weeklyBias: "",
   dailyBias: "",
+  type: "barReplay"
 };
 
-export function BarReplayTrading({ onSubmit, trades, onDeleteTrade, onBack }) {
+export function BarReplayTrading({ onBack }) {
   const {
     formData,
     handleChange,
@@ -34,19 +36,44 @@ export function BarReplayTrading({ onSubmit, trades, onDeleteTrade, onBack }) {
     resetForm
   } = useTradeForm(initialState);
 
+  const { saveTrade, fetchTrades, deleteTrade, isLoading, error } = useTradeApi();
+  const [trades, setTrades] = useState([]);
   const [saveSuccess, setSaveSuccess] = useState(false);
   const [showTrades, setShowTrades] = useState(false);
 
-  const handleSubmit = (e) => {
+  useEffect(() => {
+    loadTrades();
+  }, []);
+
+  const loadTrades = async () => {
+    try {
+      const data = await fetchTrades();
+      // Nur BarReplay Trades filtern
+      setTrades(data.filter(trade => trade.type === 'barReplay'));
+    } catch (error) {
+      console.error('Fehler beim Laden der Trades:', error);
+    }
+  };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      onSubmit(formData);
+      await saveTrade(formData);
       resetForm();
       setSaveSuccess(true);
-      setTimeout(() => setSaveSuccess(false), 3000); // Nachricht verschwindet nach 3 Sekunden
+      loadTrades();
+      setTimeout(() => setSaveSuccess(false), 3000);
     } catch (error) {
       console.error('Fehler beim Speichern:', error);
-      // Hier könnte man auch eine Fehlermeldung anzeigen
+    }
+  };
+
+  const handleDeleteTrade = async (id) => {
+    try {
+      await deleteTrade(id);
+      loadTrades();
+    } catch (error) {
+      console.error('Fehler beim Löschen:', error);
     }
   };
 
@@ -54,7 +81,7 @@ export function BarReplayTrading({ onSubmit, trades, onDeleteTrade, onBack }) {
     return <TradesList 
       trades={trades} 
       onBack={() => setShowTrades(false)} 
-      onDeleteTrade={onDeleteTrade}
+      onDeleteTrade={handleDeleteTrade}
       type="barReplay" 
     />;
   }

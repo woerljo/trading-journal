@@ -1,5 +1,6 @@
 "use client";
 import { useState } from 'react';
+import { useInsightApi } from '@/app/hooks/useInsightApi';
 import { Button } from '../ui/Button';
 import { PageContainer } from '../ui/PageContainer';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -13,48 +14,73 @@ const CATEGORIES = [
   'Sonstiges'
 ];
 
-export function InsightsForm({ insights, onSave, onBack }) {
-  const [newInsight, setNewInsight] = useState({
+export function InsightsForm({ onBack }) {
+  const [formData, setFormData] = useState({
     title: '',
     text: '',
     category: '',
-    image: ''
+    image: '',
+    date: new Date().toISOString().split('T')[0]
   });
+
+  const { saveInsight, fetchInsights, deleteInsight, isLoading, error } = useInsightApi();
+  const [insights, setInsights] = useState([]);
   const [saveSuccess, setSaveSuccess] = useState(false);
   const [deleteConfirm, setDeleteConfirm] = useState(null);
   const [showSaved, setShowSaved] = useState(false);
   const [selectedInsight, setSelectedInsight] = useState(null);
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    if (!newInsight.title.trim() || !newInsight.text.trim() || !newInsight.category) return;
+  useEffect(() => {
+    loadInsights();
+  }, []);
 
-    const insight = {
-      id: Date.now(),
-      ...newInsight,
-      date: new Date().toISOString().split('T')[0]
-    };
+  const loadInsights = async () => {
+    try {
+      const data = await fetchInsights();
+      setInsights(data);
+    } catch (error) {
+      console.error('Fehler beim Laden der Erkenntnisse:', error);
+    }
+  };
 
-    onSave([...insights, insight]);
-    setNewInsight({ title: '', text: '', category: '', image: '' });
-    setSaveSuccess(true);
-    setTimeout(() => setSaveSuccess(false), 3000);
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({ ...prev, [name]: value }));
   };
 
   const handleImageUpload = (e) => {
     const file = e.target.files[0];
     if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setNewInsight(prev => ({ ...prev, image: reader.result }));
-      };
-      reader.readAsDataURL(file);
+      setFormData(prev => ({ ...prev, image: URL.createObjectURL(file) }));
     }
   };
 
-  const handleDelete = (id) => {
-    onSave(insights.filter(insight => insight.id !== id));
-    setDeleteConfirm(null);
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      await saveInsight(formData);
+      setFormData({
+        title: '',
+        text: '',
+        category: '',
+        image: '',
+        date: new Date().toISOString().split('T')[0]
+      });
+      setSaveSuccess(true);
+      loadInsights();
+      setTimeout(() => setSaveSuccess(false), 3000);
+    } catch (error) {
+      console.error('Fehler beim Speichern:', error);
+    }
+  };
+
+  const handleDelete = async (id) => {
+    try {
+      await deleteInsight(id);
+      loadInsights();
+    } catch (error) {
+      console.error('Fehler beim Löschen:', error);
+    }
   };
 
   function InsightModal({ insight, onClose }) {
@@ -127,7 +153,7 @@ export function InsightsForm({ insights, onSave, onBack }) {
             ) : (
               insights.map((insight) => (
                 <motion.div
-                  key={insight.id}
+                  key={insight._id}
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -20 }}
@@ -152,7 +178,7 @@ export function InsightsForm({ insights, onSave, onBack }) {
                       <Button
                         onClick={(e) => {
                           e.stopPropagation();
-                          setDeleteConfirm(insight.id);
+                          setDeleteConfirm(insight._id);
                         }}
                         variant="danger"
                         className="opacity-0 group-hover:opacity-100 transition-opacity !px-2 !py-1 text-xs"
@@ -162,7 +188,7 @@ export function InsightsForm({ insights, onSave, onBack }) {
                     </div>
                   </div>
 
-                  {deleteConfirm === insight.id && (
+                  {deleteConfirm === insight._id && (
                     <div className="absolute inset-0 bg-gray-900/95 flex items-center justify-center rounded-xl">
                       <div className="text-center">
                         <p className="mb-4">Erkenntnis wirklich löschen?</p>
@@ -170,7 +196,7 @@ export function InsightsForm({ insights, onSave, onBack }) {
                           <Button
                             onClick={(e) => {
                               e.stopPropagation();
-                              handleDelete(insight.id);
+                              handleDelete(insight._id);
                             }}
                             variant="danger"
                             className="!px-4 !py-1"
@@ -211,7 +237,7 @@ export function InsightsForm({ insights, onSave, onBack }) {
 
   return (
     <PageContainer>
-      <div className="p-6 max-w-4xl mx-auto">
+      <div className="p-6 max-w-4xl mx-auto bg-gray-800/50 backdrop-blur-lg rounded-2xl shadow-2xl">
         <div className="flex justify-between items-center mb-6">
           <Button 
             onClick={onBack}
@@ -220,7 +246,7 @@ export function InsightsForm({ insights, onSave, onBack }) {
           >
             ← Zurück
           </Button>
-          <h1 className="text-3xl font-bold text-center bg-gradient-to-r from-green-400 to-blue-500 text-transparent bg-clip-text">
+          <h1 className="text-3xl font-bold text-center bg-gradient-to-r from-amber-400 to-orange-500 text-transparent bg-clip-text">
             Trading Erkenntnisse
           </h1>
           <Button
@@ -232,18 +258,31 @@ export function InsightsForm({ insights, onSave, onBack }) {
           </Button>
         </div>
 
-        {saveSuccess && (
-          <div className="fixed top-4 right-4 bg-green-500 text-white px-4 py-2 rounded shadow-lg">
-            Erkenntnis gespeichert! ✅
+        {isLoading && (
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-amber-500"></div>
+          </div>
+        )}
+        
+        {error && (
+          <div className="bg-red-500/10 border border-red-500 text-red-500 p-4 rounded-lg mb-4">
+            {error}
           </div>
         )}
 
-        <form onSubmit={handleSubmit} className="mb-8">
+        {saveSuccess && (
+          <div className="bg-green-500/10 border border-green-500 text-green-500 p-4 rounded-lg mb-4">
+            Erkenntnis erfolgreich gespeichert!
+          </div>
+        )}
+
+        <form onSubmit={handleSubmit} className="space-y-4 mb-8">
           <div className="bg-gray-800/50 backdrop-blur-lg rounded-xl p-6 shadow-lg space-y-4">
             <input
               type="text"
-              value={newInsight.title}
-              onChange={(e) => setNewInsight(prev => ({ ...prev, title: e.target.value }))}
+              value={formData.title}
+              onChange={handleChange}
+              name="title"
               placeholder="Titel der Erkenntnis..."
               className="w-full p-3 rounded-lg bg-gray-900/50 border border-gray-700 text-white 
                 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none"
@@ -251,8 +290,9 @@ export function InsightsForm({ insights, onSave, onBack }) {
             />
 
             <Select
-              value={newInsight.category}
-              onChange={(e) => setNewInsight(prev => ({ ...prev, category: e.target.value }))}
+              value={formData.category}
+              onChange={handleChange}
+              name="category"
               required
               className="w-full p-3 rounded-lg bg-gray-900/50 border border-gray-700 text-white 
                 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none appearance-none"
@@ -271,8 +311,9 @@ export function InsightsForm({ insights, onSave, onBack }) {
             </Select>
 
             <textarea
-              value={newInsight.text}
-              onChange={(e) => setNewInsight(prev => ({ ...prev, text: e.target.value }))}
+              value={formData.text}
+              onChange={handleChange}
+              name="text"
               placeholder="Beschreibe deine Erkenntnis..."
               className="w-full p-4 rounded-lg bg-gray-900/50 border border-gray-700 text-white 
                 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none min-h-[120px]"
@@ -301,6 +342,31 @@ export function InsightsForm({ insights, onSave, onBack }) {
             </Button>
           </div>
         </form>
+
+        <div className="space-y-4">
+          <h2 className="text-xl font-semibold mb-4">Gespeicherte Erkenntnisse</h2>
+          {insights.map((insight) => (
+            <div key={insight._id} className="p-4 bg-gray-700/30 rounded-lg">
+              <div className="flex justify-between items-start">
+                <div>
+                  <h3 className="text-lg font-semibold">{insight.title}</h3>
+                  <p className="text-sm text-gray-400">{insight.date}</p>
+                  <p className="mt-2">{insight.text}</p>
+                  {insight.image && (
+                    <img src={insight.image} alt="Insight" className="mt-2 rounded-lg max-w-sm" />
+                  )}
+                </div>
+                <Button
+                  onClick={() => handleDelete(insight._id)}
+                  variant="danger"
+                  className="!px-2 !py-1 text-sm"
+                >
+                  Löschen
+                </Button>
+              </div>
+            </div>
+          ))}
+        </div>
       </div>
     </PageContainer>
   );
