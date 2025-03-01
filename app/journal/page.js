@@ -4,7 +4,6 @@ import { useState, useEffect } from "react";
 import { RealTimeTrading } from '../components/trading/RealTimeTrading';
 import { BarReplayTrading } from '../components/trading/BarReplayTrading';
 import { InsightsForm } from '../components/trading/InsightsForm';
-import { TradingCalendar } from '../components/trading/TradingCalendar';
 import { QuoteDisplay } from '../components/ui/QuoteDisplay';
 import { motion } from "framer-motion";
 import { PageContainer } from "../components/ui/PageContainer";
@@ -171,8 +170,7 @@ export default function TradingJournal() {
   const components = {
     realTime: <RealTimeTrading onBack={() => setView('main')} />,
     barReplay: <BarReplayTrading onBack={() => setView('main')} />,
-    insights: <InsightsForm onBack={() => setView('main')} />,
-    calendar: <TradingCalendar onBack={() => setView('main')} />
+    insights: <InsightsForm onBack={() => setView('main')} />
   };
 
   return components[view] || null;
