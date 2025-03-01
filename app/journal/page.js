@@ -9,7 +9,6 @@ import { motion } from "framer-motion";
 import { PageContainer } from "../components/ui/PageContainer";
 import { Button } from '../components/ui/Button';
 import Link from 'next/link';
-import { Leaderboard } from '../components/trading/Leaderboard';
 
 const quotes = [
   "The goal of a successful trader is to make the best trades. Money is secondary. — Alexander Elder",
@@ -105,15 +104,6 @@ export default function TradingJournal() {
                   color: "from-emerald-500/10 to-emerald-600/10",
                   hoverColor: "hover:from-emerald-500/20 hover:to-emerald-600/20",
                   borderColor: "border-emerald-500/20"
-                },
-                {
-                  title: "Leaderboard",
-                  description: "Wöchentliche Top Trader",
-                  icon: "🏆",
-                  href: "/leaderboard",
-                  color: "from-yellow-500/10 to-yellow-600/10",
-                  hoverColor: "hover:from-yellow-500/20 hover:to-yellow-600/20",
-                  borderColor: "border-yellow-500/20"
                 }
               ].map((button, index) => (
                 <motion.div
@@ -170,10 +160,6 @@ export default function TradingJournal() {
                   )}
                 </motion.div>
               ))}
-            </motion.div>
-
-            <motion.div className="mt-8">
-              <Leaderboard />
             </motion.div>
           </div>
         </div>
