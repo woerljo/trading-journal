@@ -7,7 +7,6 @@ import { Input } from '../ui/Input';
 import { Select } from '../ui/Select';
 import { PageContainer } from '../ui/PageContainer';
 import { TradesList } from './TradesList';
-import { TradingCalendar } from './TradingCalendar';
 
 const initialState = {
   date: "",
@@ -41,7 +40,6 @@ export function RealTimeTrading({ onBack }) {
   const [trades, setTrades] = useState([]);
   const [saveSuccess, setSaveSuccess] = useState(false);
   const [showTrades, setShowTrades] = useState(false);
-  const [showCalendar, setShowCalendar] = useState(false);
 
   // Trades beim ersten Laden abrufen
   useEffect(() => {
@@ -87,13 +85,6 @@ export function RealTimeTrading({ onBack }) {
       onDeleteTrade={handleDeleteTrade}
       type="realTime"
       isLoading={isLoading}
-    />;
-  }
-
-  if (showCalendar) {
-    return <TradingCalendar 
-      trades={trades} 
-      onBack={() => setShowCalendar(false)} 
     />;
   }
 
