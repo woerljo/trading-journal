@@ -94,15 +94,6 @@ export default function TradingJournal() {
                   color: "from-emerald-500/10 to-emerald-600/10",
                   hoverColor: "hover:from-emerald-500/20 hover:to-emerald-600/20",
                   borderColor: "border-emerald-500/20"
-                },
-                {
-                  title: "Position Size Calculator",
-                  description: "Berechne deine optimale Position Size",
-                  icon: "🧮",
-                  href: "/calculator",
-                  color: "from-cyan-500/10 to-cyan-600/10",
-                  hoverColor: "hover:from-cyan-500/20 hover:to-cyan-600/20",
-                  borderColor: "border-cyan-500/20"
                 }
               ].map((button, index) => (
                 <motion.div
