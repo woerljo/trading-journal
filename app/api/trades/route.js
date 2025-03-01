@@ -14,12 +14,8 @@ export async function GET(request) {
       );
     }
 
-    // Nur Real-Time Trades zurückgeben
-    const trades = await Trade.find({ 
-      userId,
-      type: 'realTime',
-      isDemo: { $ne: true }
-    });
+    // Alle Trades zurückgeben (keine Filterung)
+    const trades = await Trade.find({ userId });
 
     return NextResponse.json(trades);
   } catch (error) {
