@@ -9,6 +9,7 @@ import { QuoteDisplay } from '../components/ui/QuoteDisplay';
 import { motion } from "framer-motion";
 import { PageContainer } from "../components/ui/PageContainer";
 import { Button } from '../components/ui/Button';
+import Link from 'next/link';
 
 const quotes = [
   "Der Markt ist immer richtig.",
@@ -90,39 +91,73 @@ export default function TradingJournal() {
                   title: "Trading Kalender",
                   description: "Verfolge deine tägliche Performance",
                   icon: "📅",
-                  view: "calendar",
+                  href: "/calendar",
                   color: "from-emerald-500/10 to-emerald-600/10",
                   hoverColor: "hover:from-emerald-500/20 hover:to-emerald-600/20",
                   borderColor: "border-emerald-500/20"
+                },
+                {
+                  title: "Position Size Calculator",
+                  description: "Berechne deine optimale Position Size",
+                  icon: "🧮",
+                  href: "/calculator",
+                  color: "from-cyan-500/10 to-cyan-600/10",
+                  hoverColor: "hover:from-cyan-500/20 hover:to-cyan-600/20",
+                  borderColor: "border-cyan-500/20"
                 }
               ].map((button, index) => (
                 <motion.div
-                  key={button.view}
+                  key={button.view || button.href}
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: index * 0.1 }}
                 >
-                  <Button
-                    onClick={() => setView(button.view)}
-                    className={`w-full p-5 bg-gradient-to-r ${button.color} 
-                      ${button.hoverColor} backdrop-blur-sm rounded-lg 
-                      border ${button.borderColor} hover:border-opacity-50
-                      transition-all duration-300 group`}
-                  >
-                    <div className="flex items-center gap-4">
-                      <span className="text-2xl group-hover:scale-110 transition-transform duration-300">
-                        {button.icon}
-                      </span>
-                      <div className="text-left">
-                        <h3 className="text-lg font-semibold mb-0.5 text-white group-hover:text-opacity-90">
-                          {button.title}
-                        </h3>
-                        <p className="text-sm text-gray-400 group-hover:text-gray-300">
-                          {button.description}
-                        </p>
+                  {button.href ? (
+                    <Link href={button.href}>
+                      <Button
+                        className={`w-full p-5 bg-gradient-to-r ${button.color} 
+                          ${button.hoverColor} backdrop-blur-sm rounded-lg 
+                          border ${button.borderColor} hover:border-opacity-50
+                          transition-all duration-300 group`}
+                      >
+                        <div className="flex items-center gap-4">
+                          <span className="text-2xl group-hover:scale-110 transition-transform duration-300">
+                            {button.icon}
+                          </span>
+                          <div className="text-left">
+                            <h3 className="text-lg font-semibold mb-0.5 text-white group-hover:text-opacity-90">
+                              {button.title}
+                            </h3>
+                            <p className="text-sm text-gray-400 group-hover:text-gray-300">
+                              {button.description}
+                            </p>
+                          </div>
+                        </div>
+                      </Button>
+                    </Link>
+                  ) : (
+                    <Button
+                      onClick={() => setView(button.view)}
+                      className={`w-full p-5 bg-gradient-to-r ${button.color} 
+                        ${button.hoverColor} backdrop-blur-sm rounded-lg 
+                        border ${button.borderColor} hover:border-opacity-50
+                        transition-all duration-300 group`}
+                    >
+                      <div className="flex items-center gap-4">
+                        <span className="text-2xl group-hover:scale-110 transition-transform duration-300">
+                          {button.icon}
+                        </span>
+                        <div className="text-left">
+                          <h3 className="text-lg font-semibold mb-0.5 text-white group-hover:text-opacity-90">
+                            {button.title}
+                          </h3>
+                          <p className="text-sm text-gray-400 group-hover:text-gray-300">
+                            {button.description}
+                          </p>
+                        </div>
                       </div>
-                    </div>
-                  </Button>
+                    </Button>
+                  )}
                 </motion.div>
               ))}
             </motion.div>
