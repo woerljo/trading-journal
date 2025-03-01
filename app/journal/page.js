@@ -11,11 +11,21 @@ import { Button } from '../components/ui/Button';
 import Link from 'next/link';
 
 const quotes = [
-  "Der Markt ist immer richtig.",
-  "Geduld ist der Schlüssel zum Erfolg im Trading.",
-  "Der Trend ist dein Freund.",
-  "Lass deine Gewinne laufen, begrenze deine Verluste.",
-  "Plan deinen Trade, trade deinen Plan.",
+  "The goal of a successful trader is to make the best trades. Money is secondary. — Alexander Elder",
+  "In trading and investing, it's not whether you're right or wrong that's important, but how much money you make when you're right and how much you lose when you're wrong. — George Soros",
+  "The market is a device for transferring money from the impatient to the patient. — Warren Buffett",
+  "It's not whether you're winning or losing, it's whether you're learning or not. — Unknown",
+  "Do not be embarrassed by your failures, learn from them and start again. — Richard Branson",
+  "A trader's greatest asset is patience. — Unknown",
+  "The best traders have no ego. — Mark Minervini",
+  "Risk comes from not knowing what you're doing. — Warren Buffett",
+  "The hardest thing in trading is to not overtrade. — Unknown",
+  "Success in trading requires the ability to take losses without regret and make profits without elation. — Unknown",
+  "It's not the strongest of the species that survive, nor the most intelligent, but the one most responsive to change. — Charles Darwin",
+  "You don't need to be a genius to succeed in trading; you just need a well-thought-out plan and the discipline to follow it. — Unknown",
+  "Your biggest loss is not learning from your mistakes. — Unknown",
+  "Trading is not about being right, it's about making money. — Unknown",
+  "Patience is the key to success in trading. You don't have to be right every time, just right most of the time. — Unknown"
 ];
 
 export default function TradingJournal() {
