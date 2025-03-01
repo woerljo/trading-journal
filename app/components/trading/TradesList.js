@@ -90,19 +90,49 @@ function TradeModal({ trade, onClose, type }) {
 
 // Neue Analyse-Modal Komponente
 function AnalysisModal({ trades, onClose, type }) {
+  const [analysisTimeRange, setAnalysisTimeRange] = useState('all');
+
+  // Trades nach Zeitraum filtern
+  const filteredTrades = trades.filter(trade => {
+    if (analysisTimeRange === 'all') return true;
+    
+    // Bei Bar-Replay: createdAt verwenden
+    // Bei Real-Time: trade.date verwenden
+    const tradeDate = type === 'barReplay' 
+      ? new Date(trade.createdAt)  // Wann wurde der Trade erstellt
+      : new Date(trade.date);      // Wann war der Trade
+    
+    const now = new Date();
+    
+    switch (analysisTimeRange) {
+      case 'week':
+        const weekAgo = new Date(now - 7 * 24 * 60 * 60 * 1000);
+        return tradeDate >= weekAgo;
+      case 'month':
+        const monthAgo = new Date(now.setMonth(now.getMonth() - 1));
+        return tradeDate >= monthAgo;
+      case 'threeMonths':
+        const threeMonthsAgo = new Date(now.setMonth(now.getMonth() - 3));
+        return tradeDate >= threeMonthsAgo;
+      default:
+        return true;
+    }
+  });
+
+  // Stats basierend auf gefilterten Trades berechnen
   const stats = {
-    totalTrades: trades.length,
-    winningTrades: trades.filter(t => t.profitType === 'profit').length,
-    losingTrades: trades.filter(t => t.profitType === 'loss').length,
-    totalProfit: trades.reduce((sum, trade) => {
+    totalTrades: filteredTrades.length,
+    winningTrades: filteredTrades.filter(t => t.profitType === 'profit').length,
+    losingTrades: filteredTrades.filter(t => t.profitType === 'loss').length,
+    totalProfit: filteredTrades.reduce((sum, trade) => {
       const amount = parseFloat(trade.profitAmount);
       return sum + (trade.profitType === 'profit' ? amount : -amount);
     }, 0),
-    winRate: (trades.filter(t => t.profitType === 'profit').length / trades.length * 100).toFixed(1),
+    winRate: (filteredTrades.filter(t => t.profitType === 'profit').length / filteredTrades.length * 100).toFixed(1),
     
     // Häufigste Assets
     topAssets: Object.entries(
-      trades.reduce((acc, trade) => {
+      filteredTrades.reduce((acc, trade) => {
         acc[trade.asset] = (acc[trade.asset] || 0) + 1;
         return acc;
       }, {})
@@ -110,14 +140,14 @@ function AnalysisModal({ trades, onClose, type }) {
     
     // Häufigste Strategien
     topStrategies: Object.entries(
-      trades.flatMap(t => t.strategy).reduce((acc, strat) => {
+      filteredTrades.flatMap(t => t.strategy).reduce((acc, strat) => {
         acc[strat] = (acc[strat] || 0) + 1;
         return acc;
       }, {})
     ).sort((a, b) => b[1] - a[1]).slice(0, 3),
 
     // Tageszeit-Analyse
-    timeAnalysis: trades.reduce((acc, trade) => {
+    timeAnalysis: filteredTrades.reduce((acc, trade) => {
       const hour = parseInt(trade.tradeStartTime.split(':')[0]);
       const timeSlot = hour < 12 ? 'morning' : hour < 17 ? 'afternoon' : 'evening';
       if (!acc[timeSlot]) acc[timeSlot] = { total: 0, wins: 0 };
@@ -127,40 +157,40 @@ function AnalysisModal({ trades, onClose, type }) {
     }, {}),
 
     // Durchschnittliches R:R
-    averageRR: trades.length ? (
-      trades.reduce((sum, trade) => sum + parseFloat(trade.riskReward || 0), 0) / trades.length
+    averageRR: filteredTrades.length ? (
+      filteredTrades.reduce((sum, trade) => sum + parseFloat(trade.riskReward || 0), 0) / filteredTrades.length
     ).toFixed(2) : 0,
 
     // Durchschnittliches R:R bei Gewinn-Trades
-    averageWinningRR: trades.filter(t => t.profitType === 'profit').length ? (
-      trades
+    averageWinningRR: filteredTrades.filter(t => t.profitType === 'profit').length ? (
+      filteredTrades
         .filter(t => t.profitType === 'profit')
         .reduce((sum, trade) => sum + parseFloat(trade.riskReward || 0), 0) / 
-      trades.filter(t => t.profitType === 'profit').length
+      filteredTrades.filter(t => t.profitType === 'profit').length
     ).toFixed(2) : 0,
 
     // Durchschnittliches R:R bei Verlust-Trades
-    averageLosingRR: trades.filter(t => t.profitType === 'loss').length ? (
-      trades
+    averageLosingRR: filteredTrades.filter(t => t.profitType === 'loss').length ? (
+      filteredTrades
         .filter(t => t.profitType === 'loss')
         .reduce((sum, trade) => sum + parseFloat(trade.riskReward || 0), 0) / 
-      trades.filter(t => t.profitType === 'loss').length
+      filteredTrades.filter(t => t.profitType === 'loss').length
     ).toFixed(2) : 0,
 
     // Durchschnittlicher Gewinn
-    averageProfit: trades.filter(t => t.profitType === 'profit').length ? (
-      trades
+    averageProfit: filteredTrades.filter(t => t.profitType === 'profit').length ? (
+      filteredTrades
         .filter(t => t.profitType === 'profit')
         .reduce((sum, trade) => sum + parseFloat(trade.profitAmount), 0) / 
-      trades.filter(t => t.profitType === 'profit').length
+      filteredTrades.filter(t => t.profitType === 'profit').length
     ).toFixed(2) : 0,
 
     // Durchschnittlicher Verlust
-    averageLoss: trades.filter(t => t.profitType === 'loss').length ? (
-      trades
+    averageLoss: filteredTrades.filter(t => t.profitType === 'loss').length ? (
+      filteredTrades
         .filter(t => t.profitType === 'loss')
         .reduce((sum, trade) => sum + parseFloat(trade.profitAmount), 0) / 
-      trades.filter(t => t.profitType === 'loss').length
+      filteredTrades.filter(t => t.profitType === 'loss').length
     ).toFixed(2) : 0,
   };
 
@@ -184,6 +214,19 @@ function AnalysisModal({ trades, onClose, type }) {
             Trading Analyse
           </h2>
           <button onClick={onClose} className="text-gray-400 hover:text-white">✕</button>
+        </div>
+
+        <div className="flex justify-between items-center mb-6">
+          <select 
+            value={analysisTimeRange}
+            onChange={(e) => setAnalysisTimeRange(e.target.value)}
+            className="bg-gray-700 rounded px-3 py-1"
+          >
+            <option value="all">Alle Trades</option>
+            <option value="week">Letzte Woche</option>
+            <option value="month">Letzter Monat</option>
+            <option value="threeMonths">Letzte 3 Monate</option>
+          </select>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -347,31 +390,50 @@ export function TradesList({ trades, onBack, onDeleteTrade, type }) {
   const [showAnalysis, setShowAnalysis] = useState(false);
   const [sortBy, setSortBy] = useState('date');
   const [sortDirection, setSortDirection] = useState('desc');
+  const [timeRange, setTimeRange] = useState('all');
 
-  // Sortierte Trades
   const sortedTrades = [...trades].sort((a, b) => {
     switch (sortBy) {
       case 'date':
-        const dateA = new Date(a.date + 'T' + a.tradeStartTime);
-        const dateB = new Date(b.date + 'T' + b.tradeStartTime);
-        return sortDirection === 'asc' 
-          ? dateA - dateB 
-          : dateB - dateA;
-
+        if (type === 'barReplay') {
+          const dateA = new Date(a.createdAt);
+          const dateB = new Date(b.createdAt);
+          return sortDirection === 'asc' ? dateA - dateB : dateB - dateA;
+        } else {
+          const dateA = new Date(a.date + 'T' + a.tradeStartTime);
+          const dateB = new Date(b.date + 'T' + b.tradeStartTime);
+          return sortDirection === 'asc' ? dateA - dateB : dateB - dateA;
+        }
       case 'asset':
         return sortDirection === 'asc'
           ? a.asset.localeCompare(b.asset)
           : b.asset.localeCompare(a.asset);
-
       case 'profit':
         const profitA = a.profitType === 'profit' ? a.profitAmount : -a.profitAmount;
         const profitB = b.profitType === 'profit' ? b.profitAmount : -b.profitAmount;
         return sortDirection === 'asc'
           ? profitA - profitB
           : profitB - profitA;
-
       default:
         return 0;
+    }
+  });
+
+  const filteredTrades = sortedTrades.filter(trade => {
+    if (timeRange === 'all') return true;
+    
+    const tradeDate = type === 'barReplay' 
+      ? new Date(trade.createdAt)
+      : new Date(trade.date);
+    
+    const now = new Date();
+    if (timeRange === 'week') {
+      const weekAgo = new Date(now - 7 * 24 * 60 * 60 * 1000);
+      return tradeDate >= weekAgo;
+    }
+    if (timeRange === 'month') {
+      const monthAgo = new Date(now.setMonth(now.getMonth() - 1));
+      return tradeDate >= monthAgo;
     }
   });
 
@@ -399,6 +461,18 @@ export function TradesList({ trades, onBack, onDeleteTrade, type }) {
           </Button>
         </div>
 
+        <div className="flex justify-between items-center mb-4">
+          <select 
+            value={timeRange} 
+            onChange={(e) => setTimeRange(e.target.value)}
+            className="mb-4"
+          >
+            <option value="all">Alle Trades</option>
+            <option value="week">Letzte Woche</option>
+            <option value="month">Letzter Monat</option>
+          </select>
+        </div>
+
         {trades.length === 0 ? (
           <p className="text-center text-gray-400 py-8">Noch keine Trades vorhanden</p>
         ) : (
@@ -410,7 +484,7 @@ export function TradesList({ trades, onBack, onDeleteTrade, type }) {
               setSortDirection={setSortDirection}
             />
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-              {sortedTrades.map((trade) => (
+              {filteredTrades.map((trade) => (
                 <motion.div
                   key={trade._id}
                   layoutId={`trade-${trade._id}`}
