@@ -7,11 +7,11 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Select } from '../ui/Select';
 
 const CATEGORIES = [
-  'Psychologie',
-  'Marktanalyse',
-  'Strategie',
-  'Fehleranalyse',
-  'Sonstiges'
+  { value: 'Psychologie', label: 'Psychologie' },
+  { value: 'Marktanalyse', label: 'Marktanalyse' },
+  { value: 'Strategie', label: 'Strategie' },
+  { value: 'Fehleranalyse', label: 'Fehleranalyse' },
+  { value: 'Sonstiges', label: 'Sonstiges' }
 ];
 
 export function InsightsForm({ onBack }) {
@@ -33,11 +33,7 @@ export function InsightsForm({ onBack }) {
 
   const categories = [
     { value: 'all', label: 'Alle' },
-    { value: 'psychology', label: 'Psychologie' },
-    { value: 'market', label: 'Marktanalyse' },
-    { value: 'strategy', label: 'Strategie' },
-    { value: 'mistake', label: 'Fehleranalyse' },
-    { value: 'other', label: 'Sonstiges' }
+    ...CATEGORIES
   ];
 
   useEffect(() => {
@@ -352,19 +348,12 @@ export function InsightsForm({ onBack }) {
               onChange={handleChange}
               name="category"
               required
-              className="w-full p-3 rounded-lg bg-gray-900/50 border border-gray-700 text-white 
-                focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none appearance-none"
-              style={{
-                backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%236B7280'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E")`,
-                backgroundRepeat: 'no-repeat',
-                backgroundPosition: 'right 0.75rem center',
-                backgroundSize: '1.25rem',
-                paddingRight: '2.5rem'
-              }}
             >
               <option value="" className="bg-gray-900">Kategorie wählen</option>
               {CATEGORIES.map(cat => (
-                <option key={cat} value={cat} className="bg-gray-900">{cat}</option>
+                <option key={cat.value} value={cat.value} className="bg-gray-900">
+                  {cat.label}
+                </option>
               ))}
             </Select>
 
