@@ -87,7 +87,7 @@ function TradeModal({ trade, onClose, type }) {
               <p className="text-sm text-gray-400">Profit/Loss</p>
               <p className={trade.profitType === 'profit' ? 'text-green-500' : 'text-red-500'}>
                 {trade.profitType === 'profit' ? '+' : '-'}
-                {trade.profitAmount}{type === 'realTime' ? '$' : '%'}
+                {parseFloat(trade.profitAmount).toFixed(2)}{type === 'realTime' ? '$' : '%'}
               </p>
             </div>
           </div>
@@ -169,7 +169,7 @@ function AnalysisModal({ trades, onClose, type }) {
     totalProfit: filteredTrades.reduce((sum, trade) => {
       const amount = parseFloat(trade.profitAmount);
       return sum + (trade.profitType === 'profit' ? amount : -amount);
-    }, 0),
+    }, 0).toFixed(2),
     winRate: (filteredTrades.filter(t => t.profitType === 'profit').length / filteredTrades.length * 100).toFixed(1),
     
     // Häufigste Assets
@@ -201,7 +201,7 @@ function AnalysisModal({ trades, onClose, type }) {
     // Durchschnittliches R:R
     averageRR: filteredTrades.length ? (
       filteredTrades.reduce((sum, trade) => sum + parseFloat(trade.riskReward || 0), 0) / filteredTrades.length
-    ).toFixed(2) : 0,
+    ).toFixed(2) : '0.00',
 
     // Durchschnittliches R:R bei Gewinn-Trades
     averageWinningRR: filteredTrades.filter(t => t.profitType === 'profit').length ? (
@@ -556,7 +556,7 @@ export function TradesList({ trades, onBack, onDeleteTrade, type }) {
                       </div>
                       <p className={`font-bold text-sm ${trade.profitType === 'profit' ? 'text-green-500' : 'text-red-500'}`}>
                         {trade.profitType === 'profit' ? '+' : '-'}
-                        {trade.profitAmount}{type === 'realTime' ? '$' : '%'}
+                        {parseFloat(trade.profitAmount).toFixed(2)}{type === 'realTime' ? '$' : '%'}
                       </p>
                     </div>
                     
