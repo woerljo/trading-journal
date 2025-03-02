@@ -40,16 +40,27 @@ export default function TradingJournal() {
     return (
       <PageContainer>
         <div className="min-h-screen py-12 px-4 relative overflow-hidden">
-          {/* Subtilere Hintergrund-Elemente */}
+          {/* Animated Background Elements */}
           <div className="absolute inset-0 overflow-hidden">
-            <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-b from-blue-900/10 to-transparent" />
             <motion.div 
               animate={{ 
-                scale: [1, 1.1, 1],
+                rotate: [0, 360],
+                scale: [1, 1.2, 1],
                 opacity: [0.1, 0.15, 0.1],
               }}
-              transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
-              className="absolute -top-[20%] -left-[20%] w-[100%] h-[100%] rounded-full bg-blue-500/5 blur-3xl"
+              transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
+              className="absolute -top-[40%] -left-[40%] w-[100%] h-[100%] 
+                rounded-full bg-blue-500/5 blur-3xl"
+            />
+            <motion.div 
+              animate={{ 
+                rotate: [360, 0],
+                scale: [1, 1.3, 1],
+                opacity: [0.1, 0.15, 0.1],
+              }}
+              transition={{ duration: 25, repeat: Infinity, ease: "linear" }}
+              className="absolute -bottom-[40%] -right-[40%] w-[100%] h-[100%] 
+                rounded-full bg-purple-500/5 blur-3xl"
             />
           </div>
 
@@ -66,8 +77,22 @@ export default function TradingJournal() {
               <QuoteDisplay quote={randomQuote} />
             </motion.div>
 
-            {/* Buttons Container */}
-            <motion.div className="space-y-3">
+            {/* Trading Buttons mit Hover-Effekten */}
+            <motion.div 
+              variants={{
+                hidden: { opacity: 0, y: 20 },
+                show: {
+                  opacity: 1,
+                  y: 0,
+                  transition: {
+                    staggerChildren: 0.2
+                  }
+                }
+              }}
+              initial="hidden"
+              animate="show"
+              className="space-y-4"
+            >
               {[
                 {
                   title: "Real-Time Trading",
@@ -108,24 +133,34 @@ export default function TradingJournal() {
               ].map((button, index) => (
                 <motion.div
                   key={button.view || button.href}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: index * 0.1 }}
+                  variants={{
+                    hidden: { opacity: 0, x: -20 },
+                    show: { opacity: 1, x: 0 }
+                  }}
+                  whileHover={{ 
+                    scale: 1.02,
+                    transition: { duration: 0.2 }
+                  }}
+                  whileTap={{ scale: 0.98 }}
+                  className="relative group"
                 >
+                  <div className={`absolute inset-0 bg-gradient-to-r ${button.color} 
+                    opacity-0 group-hover:opacity-100 transition-opacity duration-300 
+                    rounded-xl blur`} 
+                  />
                   {button.href ? (
                     <Link href={button.href}>
                       <Button
-                        className={`w-full p-5 bg-gradient-to-r ${button.color} 
-                          ${button.hoverColor} backdrop-blur-sm rounded-lg 
-                          border ${button.borderColor} hover:border-opacity-50
+                        className={`relative w-full p-6 rounded-xl bg-gray-800/50 
+                          backdrop-blur-sm border border-gray-700/50 text-white 
                           transition-all duration-300 group`}
                       >
                         <div className="flex items-center gap-4">
-                          <span className="text-2xl group-hover:scale-110 transition-transform duration-300">
+                          <span className="text-3xl group-hover:scale-110 transition-transform duration-300">
                             {button.icon}
                           </span>
                           <div className="text-left">
-                            <h3 className="text-lg font-semibold mb-0.5 text-white group-hover:text-opacity-90">
+                            <h3 className="text-xl font-bold mb-1 group-hover:text-opacity-90">
                               {button.title}
                             </h3>
                             <p className="text-sm text-gray-400 group-hover:text-gray-300">
@@ -138,17 +173,16 @@ export default function TradingJournal() {
                   ) : (
                     <Button
                       onClick={() => setView(button.view)}
-                      className={`w-full p-5 bg-gradient-to-r ${button.color} 
-                        ${button.hoverColor} backdrop-blur-sm rounded-lg 
-                        border ${button.borderColor} hover:border-opacity-50
+                      className={`relative w-full p-6 rounded-xl bg-gray-800/50 
+                        backdrop-blur-sm border border-gray-700/50 text-white 
                         transition-all duration-300 group`}
                     >
                       <div className="flex items-center gap-4">
-                        <span className="text-2xl group-hover:scale-110 transition-transform duration-300">
+                        <span className="text-3xl group-hover:scale-110 transition-transform duration-300">
                           {button.icon}
                         </span>
                         <div className="text-left">
-                          <h3 className="text-lg font-semibold mb-0.5 text-white group-hover:text-opacity-90">
+                          <h3 className="text-xl font-bold mb-1 group-hover:text-opacity-90">
                             {button.title}
                           </h3>
                           <p className="text-sm text-gray-400 group-hover:text-gray-300">
