@@ -78,6 +78,11 @@ export function RealTimeTrading({ onBack }) {
     }
   };
 
+  const totalPerformance = trades.reduce((sum, trade) => {
+    const amount = parseFloat(trade.profitAmount);
+    return sum + (trade.profitType === 'profit' ? amount : -amount);
+  }, 0).toFixed(2);
+
   if (showTrades) {
     return <TradesList 
       trades={trades} 
@@ -293,6 +298,13 @@ export function RealTimeTrading({ onBack }) {
             </Button>
           </div>
         </form>
+
+        <div className="mt-8">
+          <h2 className="text-2xl font-semibold mb-4">Gesamtperformance</h2>
+          <span className={`text-lg ${totalPerformance >= 0 ? 'text-green-500' : 'text-red-500'}`}>
+            {totalPerformance > 0 ? '+' : ''}{totalPerformance}%
+          </span>
+        </div>
       </div>
     </PageContainer>
   );
