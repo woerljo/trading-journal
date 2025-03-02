@@ -220,7 +220,9 @@ function AnalysisModal({ trades, onClose, type }) {
           <select 
             value={analysisTimeRange}
             onChange={(e) => setAnalysisTimeRange(e.target.value)}
-            className="bg-gray-700 rounded px-3 py-1"
+            className="bg-gray-800 text-white border border-gray-700 rounded-lg px-4 py-2 
+              focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent
+              hover:bg-gray-700 transition-colors"
           >
             <option value="all">Alle Trades</option>
             <option value="week">Letzte Woche</option>
@@ -465,7 +467,9 @@ export function TradesList({ trades, onBack, onDeleteTrade, type }) {
           <select 
             value={timeRange} 
             onChange={(e) => setTimeRange(e.target.value)}
-            className="mb-4"
+            className="bg-gray-800 text-white border border-gray-700 rounded-lg px-4 py-2 
+              focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent
+              hover:bg-gray-700 transition-colors"
           >
             <option value="all">Alle Trades</option>
             <option value="week">Letzte Woche</option>
