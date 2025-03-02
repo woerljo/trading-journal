@@ -29,6 +29,16 @@ export function InsightsForm({ onBack }) {
   const [deleteConfirm, setDeleteConfirm] = useState(null);
   const [showSaved, setShowSaved] = useState(false);
   const [selectedInsight, setSelectedInsight] = useState(null);
+  const [selectedCategories, setSelectedCategories] = useState(['all']);
+
+  const categories = [
+    { value: 'all', label: 'Alle' },
+    { value: 'psychology', label: 'Psychologie' },
+    { value: 'market', label: 'Marktanalyse' },
+    { value: 'strategy', label: 'Strategie' },
+    { value: 'mistake', label: 'Fehleranalyse' },
+    { value: 'other', label: 'Sonstiges' }
+  ];
 
   useEffect(() => {
     if (showSaved) {
@@ -131,6 +141,11 @@ export function InsightsForm({ onBack }) {
     );
   }
 
+  const filteredInsights = insights.filter(insight => {
+    if (selectedCategories.includes('all')) return true;
+    return selectedCategories.includes(insight.category);
+  });
+
   if (showSaved) {
     return (
       <PageContainer>
@@ -149,11 +164,52 @@ export function InsightsForm({ onBack }) {
             <div className="w-20"></div>
           </div>
 
+          <div className="flex flex-wrap gap-2 mb-4">
+            {categories.map(cat => (
+              <label 
+                key={cat.value}
+                className={`px-3 py-1.5 rounded-lg text-sm cursor-pointer transition-colors
+                  ${selectedCategories.includes(cat.value) 
+                    ? 'bg-blue-500/20 text-blue-400 border border-blue-500/50' 
+                    : 'bg-gray-800/50 text-gray-400 hover:bg-gray-700/50 border border-transparent'
+                  }`}
+              >
+                <input
+                  type="checkbox"
+                  checked={selectedCategories.includes(cat.value)}
+                  onChange={(e) => {
+                    if (e.target.checked) {
+                      if (cat.value === 'all') {
+                        setSelectedCategories(['all']);
+                      } else {
+                        setSelectedCategories(prev => 
+                          prev.filter(c => c !== 'all').concat(cat.value)
+                        );
+                      }
+                    } else {
+                      if (cat.value === 'all') {
+                        setSelectedCategories([]);
+                      } else {
+                        setSelectedCategories(prev => 
+                          prev.filter(c => c !== cat.value)
+                        );
+                      }
+                    }
+                  }}
+                  className="sr-only"
+                />
+                <span>{cat.label}</span>
+              </label>
+            ))}
+          </div>
+
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {insights.length === 0 ? (
-              <p className="text-center text-gray-400 py-8 col-span-full">Noch keine Erkenntnisse vorhanden</p>
+            {filteredInsights.length === 0 ? (
+              <p className="text-center text-gray-400 py-8 col-span-full">
+                Keine Erkenntnisse in dieser Kategorie
+              </p>
             ) : (
-              insights.map((insight) => (
+              filteredInsights.map((insight) => (
                 <motion.div
                   key={insight._id}
                   initial={{ opacity: 0, y: 20 }}
