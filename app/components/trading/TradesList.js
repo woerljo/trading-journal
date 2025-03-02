@@ -5,6 +5,8 @@ import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 function TradeModal({ trade, onClose, type }) {
+  const [isImageEnlarged, setIsImageEnlarged] = useState(false);
+
   return (
     <motion.div
       initial={{ opacity: 0 }}
@@ -13,6 +15,30 @@ function TradeModal({ trade, onClose, type }) {
       className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4"
       onClick={onClose}
     >
+      {/* Vergrößertes Bild */}
+      {isImageEnlarged && trade.image && (
+        <motion.div
+          initial={{ scale: 0.9, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          exit={{ scale: 0.9, opacity: 0 }}
+          className="fixed inset-0 z-60 flex items-center justify-center p-4 bg-black/90"
+          onClick={() => setIsImageEnlarged(false)}
+        >
+          <img 
+            src={trade.image} 
+            alt="Trade Screenshot"
+            className="max-w-full max-h-[90vh] object-contain rounded-lg"
+          />
+          <button 
+            className="absolute top-4 right-4 text-white/60 hover:text-white text-xl"
+            onClick={() => setIsImageEnlarged(false)}
+          >
+            ✕
+          </button>
+        </motion.div>
+      )}
+
+      {/* Normales Modal */}
       <motion.div
         initial={{ scale: 0.95, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
@@ -80,6 +106,22 @@ function TradeModal({ trade, onClose, type }) {
             <div>
               <p className="text-sm text-gray-400">Notizen</p>
               <p className="text-gray-300">{trade.notes}</p>
+            </div>
+          )}
+
+          {/* Bild mit Klick-Handler */}
+          {trade.image && (
+            <div className="mb-4">
+              <p className="text-sm text-gray-400 mb-2">Screenshot</p>
+              <img 
+                src={trade.image} 
+                alt="Trade Screenshot"
+                className="w-full h-48 object-cover rounded-lg cursor-pointer hover:opacity-90 transition-opacity"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setIsImageEnlarged(true);
+                }}
+              />
             </div>
           )}
         </div>
