@@ -9,7 +9,6 @@ import { motion } from "framer-motion";
 import { PageContainer } from "../components/ui/PageContainer";
 import { Button } from '../components/ui/Button';
 import Link from 'next/link';
-import { GoalsForm } from '../components/trading/GoalsForm';
 
 const quotes = [
   "The goal of a successful trader is to make the best trades. Money is secondary. — Alexander Elder",
@@ -130,15 +129,6 @@ export default function TradingJournal() {
                   color: "from-emerald-500/10 to-emerald-600/10",
                   hoverColor: "hover:from-emerald-500/20 hover:to-emerald-600/20",
                   borderColor: "border-emerald-500/20"
-                },
-                {
-                  title: "Trading Ziele",
-                  description: "Setze und verfolge deine Ziele",
-                  icon: "🎯",
-                  view: "goals",
-                  color: "from-pink-500/10 to-pink-600/10",
-                  hoverColor: "hover:from-pink-500/20 hover:to-pink-600/20",
-                  borderColor: "border-pink-500/20"
                 }
               ].map((button, index) => (
                 <motion.div
@@ -211,12 +201,10 @@ export default function TradingJournal() {
     );
   }
 
-  // Aktualisierte components mit korrekten Props
   const components = {
     realTime: <RealTimeTrading onBack={() => setView('main')} />,
     barReplay: <BarReplayTrading onBack={() => setView('main')} />,
-    insights: <InsightsForm onBack={() => setView('main')} />,
-    goals: <GoalsForm onBack={() => setView('main')} />
+    insights: <InsightsForm onBack={() => setView('main')} />
   };
 
   return components[view] || null;
