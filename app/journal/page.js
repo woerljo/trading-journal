@@ -9,6 +9,7 @@ import { motion } from "framer-motion";
 import { PageContainer } from "../components/ui/PageContainer";
 import { Button } from '../components/ui/Button';
 import Link from 'next/link';
+import { GoalsForm } from '../components/trading/GoalsForm';
 
 const quotes = [
   "The goal of a successful trader is to make the best trades. Money is secondary. — Alexander Elder",
@@ -214,7 +215,8 @@ export default function TradingJournal() {
   const components = {
     realTime: <RealTimeTrading onBack={() => setView('main')} />,
     barReplay: <BarReplayTrading onBack={() => setView('main')} />,
-    insights: <InsightsForm onBack={() => setView('main')} />
+    insights: <InsightsForm onBack={() => setView('main')} />,
+    goals: <GoalsForm onBack={() => setView('main')} />
   };
 
   return components[view] || null;
