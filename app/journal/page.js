@@ -129,6 +129,15 @@ export default function TradingJournal() {
                   color: "from-emerald-500/10 to-emerald-600/10",
                   hoverColor: "hover:from-emerald-500/20 hover:to-emerald-600/20",
                   borderColor: "border-emerald-500/20"
+                },
+                {
+                  title: "Trading Ziele",
+                  description: "Setze und verfolge deine Ziele",
+                  icon: "🎯",
+                  view: "goals",
+                  color: "from-pink-500/10 to-pink-600/10",
+                  hoverColor: "hover:from-pink-500/20 hover:to-pink-600/20",
+                  borderColor: "border-pink-500/20"
                 }
               ].map((button, index) => (
                 <motion.div
