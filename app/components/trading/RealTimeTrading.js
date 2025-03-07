@@ -13,6 +13,7 @@ const initialState = {
   tradeStartTime: "",
   tradeEndTime: "",
   asset: "",
+  tradeDirection: "long",
   entry: "",
   exit: "",
   stopLoss: "",
@@ -24,7 +25,6 @@ const initialState = {
   image: "",
   weeklyBias: "",
   dailyBias: "",
-  tradeDirection: 'long',
   type: "realTime" // Wichtig: Typ des Trades festlegen
 };
 
@@ -178,10 +178,10 @@ export function RealTimeTrading({ onBack }) {
           <Input
             label="Entry Preis"
             type="number"
+            step="0.00001"
             name="entry"
             value={formData.entry}
             onChange={handleChange}
-            step="0.00001"
             required
           />
           <Input
