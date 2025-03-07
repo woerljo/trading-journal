@@ -63,16 +63,16 @@ export function RealTimeTrading({ onBack }) {
     try {
       setIsSubmitting(true);
       
-      // Stelle sicher dass tradeDirection korrekt ist
+      // Stelle sicher, dass die ausgewählte Trade-Richtung gespeichert wird
       const dataToSubmit = {
         ...formData,
-        tradeDirection: formData.tradeDirection || 'long', // Fallback zu 'long' wenn nicht gesetzt
+        tradeDirection: formData.tradeDirection // Die ausgewählte Richtung (long/short)
       };
 
-      const response = await saveTrade(dataToSubmit);
+      await saveTrade(dataToSubmit);
       resetForm();
       setSaveSuccess(true);
-      loadTrades(); // Trades neu laden
+      loadTrades();
       setTimeout(() => setSaveSuccess(false), 3000);
     } catch (error) {
       console.error('Fehler beim Speichern:', error);
