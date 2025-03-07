@@ -3,32 +3,9 @@ import { Button } from '../ui/Button';
 import { PageContainer } from '../ui/PageContainer';
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Select } from '../ui/Select';
 
-function TradeModal({ trade, onClose, type, onTradeUpdate }) {
+function TradeModal({ trade, onClose, type }) {
   const [isImageEnlarged, setIsImageEnlarged] = useState(false);
-  const [isEditing, setIsEditing] = useState(false);
-
-  const handleEdit = async (updatedData) => {
-    try {
-      const response = await fetch(`/api/trades/${trade._id}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(updatedData),
-      });
-
-      if (!response.ok) throw new Error('Fehler beim Aktualisieren');
-
-      const updatedTrade = await response.json();
-      // Aktualisiere den Trade in der Liste
-      onTradeUpdate(updatedTrade);
-      setIsEditing(false);
-    } catch (error) {
-      console.error('Fehler beim Aktualisieren:', error);
-    }
-  };
 
   return (
     <motion.div
@@ -71,15 +48,7 @@ function TradeModal({ trade, onClose, type, onTradeUpdate }) {
       >
         <div className="flex justify-between items-start mb-4">
           <h3 className="text-xl font-bold">{trade.asset}</h3>
-          <div className="flex gap-2">
-            <button
-              onClick={() => setIsEditing(true)}
-              className="text-blue-400 hover:text-blue-300"
-            >
-              ✏️ Bearbeiten
-            </button>
-            <button onClick={onClose} className="text-gray-400 hover:text-white">✕</button>
-          </div>
+          <button onClick={onClose} className="text-gray-400 hover:text-white">✕</button>
         </div>
 
         <div className="grid gap-4">
@@ -89,8 +58,8 @@ function TradeModal({ trade, onClose, type, onTradeUpdate }) {
               <p>{trade.date}</p>
             </div>
             <div>
-              <p className="text-sm text-gray-400">Trade Richtung</p>
-              <p>{trade.tradeDirection === 'long' ? 'Long' : 'Short'}</p>
+              <p className="text-sm text-gray-400">Zeit</p>
+              <p>{trade.tradeStartTime} - {trade.tradeEndTime}</p>
             </div>
           </div>
 
@@ -156,115 +125,6 @@ function TradeModal({ trade, onClose, type, onTradeUpdate }) {
             </div>
           )}
         </div>
-
-        {isEditing ? (
-          <form onSubmit={(e) => {
-            e.preventDefault();
-            handleEdit({
-              ...trade,
-              tradeDirection: e.target.tradeDirection.value,
-            });
-          }}>
-            <div className="grid gap-4">
-              <Select
-                label="Trade Richtung"
-                name="tradeDirection"
-                defaultValue={trade.tradeDirection}
-              >
-                <option value="long">Long</option>
-                <option value="short">Short</option>
-              </Select>
-
-              <div className="flex gap-2 justify-end mt-4">
-                <Button type="submit" variant="primary">
-                  Speichern
-                </Button>
-                <Button 
-                  type="button" 
-                  variant="secondary"
-                  onClick={() => setIsEditing(false)}
-                >
-                  Abbrechen
-                </Button>
-              </div>
-            </div>
-          </form>
-        ) : (
-          <div className="grid gap-4">
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <p className="text-sm text-gray-400">Datum</p>
-                <p>{trade.date}</p>
-              </div>
-              <div>
-                <p className="text-sm text-gray-400">Trade Richtung</p>
-                <p>{trade.tradeDirection === 'long' ? 'Long' : 'Short'}</p>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-3 gap-4">
-              <div>
-                <p className="text-sm text-gray-400">Entry</p>
-                <p>{trade.entry}</p>
-              </div>
-              <div>
-                <p className="text-sm text-gray-400">Exit</p>
-                <p>{trade.exit}</p>
-              </div>
-              <div>
-                <p className="text-sm text-gray-400">Stop Loss</p>
-                <p>{trade.stopLoss}</p>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <p className="text-sm text-gray-400">Risk:Reward</p>
-                <p>{trade.riskReward}R</p>
-              </div>
-              <div>
-                <p className="text-sm text-gray-400">Profit/Loss</p>
-                <p className={trade.profitType === 'profit' ? 'text-green-500' : 'text-red-500'}>
-                  {trade.profitType === 'profit' ? '+' : '-'}
-                  {parseFloat(trade.profitAmount).toFixed(2)}{type === 'realTime' ? '$' : '%'}
-                </p>
-              </div>
-            </div>
-
-            <div>
-              <p className="text-sm text-gray-400">Bias</p>
-              <p>Weekly: {trade.weeklyBias} / Daily: {trade.dailyBias}</p>
-            </div>
-
-            <div>
-              <p className="text-sm text-gray-400">Confluences</p>
-              <p>{trade.strategy.join(', ')}</p>
-            </div>
-
-            {trade.notes && (
-              <div>
-                <p className="text-sm text-gray-400">Notizen</p>
-                <p className="text-gray-300">{trade.notes}</p>
-              </div>
-            )}
-
-            {/* Bild mit Klick-Handler */}
-            {trade.image && (
-              <div className="mb-4">
-                <p className="text-sm text-gray-400 mb-2">Screenshot</p>
-                <img 
-                  src={trade.image} 
-                  alt="Trade Screenshot"
-                  className="w-full h-48 object-cover rounded-lg cursor-pointer hover:opacity-90 transition-opacity"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setIsImageEnlarged(true);
-                  }}
-                />
-              </div>
-            )}
-          </div>
-        )}
       </motion.div>
     </motion.div>
   );
@@ -568,7 +428,7 @@ function SortHeader({ sortBy, setSortBy, sortDirection, setSortDirection }) {
   );
 }
 
-export function TradesList({ trades, onBack, onDeleteTrade, type, onTradeUpdate }) {
+export function TradesList({ trades, onBack, onDeleteTrade, type }) {
   const [selectedTrade, setSelectedTrade] = useState(null);
   const [deleteConfirm, setDeleteConfirm] = useState(null);
   const [showAnalysis, setShowAnalysis] = useState(false);
@@ -620,15 +480,6 @@ export function TradesList({ trades, onBack, onDeleteTrade, type, onTradeUpdate 
       return tradeDate >= monthAgo;
     }
   });
-
-  const handleTradeUpdate = (updatedTrade) => {
-    // Aktualisiere den Trade in der Liste
-    const updatedTrades = trades.map(t => 
-      t._id === updatedTrade._id ? updatedTrade : t
-    );
-    // Hier müssen wir eine neue Prop vom Parent bekommen
-    onTradeUpdate(updatedTrades);
-  };
 
   return (
     <PageContainer>
@@ -708,9 +559,6 @@ export function TradesList({ trades, onBack, onDeleteTrade, type, onTradeUpdate 
                           {trade.profitType === 'profit' ? '+' : '-'}
                           {parseFloat(trade.profitAmount).toFixed(2)}{type === 'realTime' ? '$' : '%'}
                         </p>
-                        <p className={`text-xs ${trade.tradeDirection === 'long' ? 'text-green-500' : 'text-red-500'}`}>
-                          {trade.tradeDirection === 'long' ? 'Long' : 'Short'}
-                        </p>
                       </div>
                     </div>
                     
@@ -770,7 +618,6 @@ export function TradesList({ trades, onBack, onDeleteTrade, type, onTradeUpdate 
             trade={selectedTrade} 
             onClose={() => setSelectedTrade(null)}
             type={type}
-            onTradeUpdate={handleTradeUpdate}
           />
         )}
         {showAnalysis && (
