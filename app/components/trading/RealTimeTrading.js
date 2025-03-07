@@ -41,6 +41,7 @@ export function RealTimeTrading({ onBack }) {
   const [trades, setTrades] = useState([]);
   const [saveSuccess, setSaveSuccess] = useState(false);
   const [showTrades, setShowTrades] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Trades beim ersten Laden abrufen
   useEffect(() => {
@@ -60,7 +61,15 @@ export function RealTimeTrading({ onBack }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await saveTrade(formData);
+      setIsSubmitting(true);
+      
+      // Stelle sicher dass tradeDirection korrekt ist
+      const dataToSubmit = {
+        ...formData,
+        tradeDirection: formData.tradeDirection || 'long', // Fallback zu 'long' wenn nicht gesetzt
+      };
+
+      const response = await saveTrade(dataToSubmit);
       resetForm();
       setSaveSuccess(true);
       loadTrades(); // Trades neu laden
