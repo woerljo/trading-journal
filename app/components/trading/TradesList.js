@@ -58,8 +58,8 @@ function TradeModal({ trade, onClose, type }) {
               <p>{trade.date}</p>
             </div>
             <div>
-              <p className="text-sm text-gray-400">Zeit</p>
-              <p>{trade.tradeStartTime} - {trade.tradeEndTime}</p>
+              <p className="text-sm text-gray-400">Trade Richtung</p>
+              <p>{trade.tradeDirection === 'long' ? 'Long' : 'Short'}</p>
             </div>
           </div>
 
@@ -554,10 +554,15 @@ export function TradesList({ trades, onBack, onDeleteTrade, type }) {
                         <h3 className="font-bold text-sm">{trade.asset}</h3>
                         <p className="text-xs text-gray-400">{trade.date}</p>
                       </div>
-                      <p className={`font-bold text-sm ${trade.profitType === 'profit' ? 'text-green-500' : 'text-red-500'}`}>
-                        {trade.profitType === 'profit' ? '+' : '-'}
-                        {parseFloat(trade.profitAmount).toFixed(2)}{type === 'realTime' ? '$' : '%'}
-                      </p>
+                      <div className="text-right">
+                        <p className={`font-bold text-sm ${trade.profitType === 'profit' ? 'text-green-500' : 'text-red-500'}`}>
+                          {trade.profitType === 'profit' ? '+' : '-'}
+                          {parseFloat(trade.profitAmount).toFixed(2)}{type === 'realTime' ? '$' : '%'}
+                        </p>
+                        <p className={`text-xs ${trade.tradeDirection === 'long' ? 'text-green-500' : 'text-red-500'}`}>
+                          {trade.tradeDirection === 'long' ? 'Long' : 'Short'}
+                        </p>
+                      </div>
                     </div>
                     
                     <div className="flex justify-between items-center">
