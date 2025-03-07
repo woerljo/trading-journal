@@ -9,7 +9,7 @@ import { PageContainer } from '../ui/PageContainer';
 import { TradesList } from './TradesList';
 
 const initialState = {
-  date: "",
+  date: new Date().toISOString().split('T')[0],
   tradeStartTime: "",
   tradeEndTime: "",
   asset: "",
@@ -24,6 +24,7 @@ const initialState = {
   image: "",
   weeklyBias: "",
   dailyBias: "",
+  tradeDirection: 'long',
   type: "realTime" // Wichtig: Typ des Trades festlegen
 };
 
@@ -164,6 +165,16 @@ export function RealTimeTrading({ onBack }) {
             placeholder="z.B. EUR/USD"
             required
           />
+          <Select
+            label="Trade Richtung"
+            name="tradeDirection"
+            value={formData.tradeDirection}
+            onChange={handleChange}
+            required
+          >
+            <option value="long">Long</option>
+            <option value="short">Short</option>
+          </Select>
           <Input
             label="Entry Preis"
             type="number"
@@ -205,12 +216,20 @@ export function RealTimeTrading({ onBack }) {
             label="Profit/Loss"
             name="profitType"
             value={formData.profitType}
-            onChange={handleChange}
+            onChange={(e) => {
+              const value = e.target.value;
+              handleChange(e);
+              // Bei Break Even automatisch 0 setzen
+              if (value === 'breakEven') {
+                setFormData(prev => ({...prev, profitAmount: "0"}));
+              }
+            }}
             required
           >
             <option value="">Bitte wählen</option>
             <option value="profit">Profit</option>
             <option value="loss">Loss</option>
+            <option value="breakEven">Break Even</option>
           </Select>
           <Input
             label="Betrag in $"
