@@ -49,15 +49,13 @@ function TradeModal({ trade, onClose, type }) {
         <div className="flex justify-between items-start mb-4">
           <div className="flex items-center gap-2">
             <h3 className="text-xl font-bold">{trade.asset}</h3>
-            {trade.tradeDirection && (
-              <span className={`text-sm px-2 py-0.5 rounded-full ${
-                trade.tradeDirection === 'long' 
-                  ? 'bg-green-500/20 text-green-400' 
-                  : 'bg-red-500/20 text-red-400'
-              }`}>
-                {trade.tradeDirection === 'long' ? 'Long' : 'Short'}
-              </span>
-            )}
+            <span className={`text-sm px-2 py-0.5 rounded-full ${
+              trade.tradeDirection === 'long' 
+                ? 'bg-green-500/20 text-green-400' 
+                : 'bg-red-500/20 text-red-400'
+            }`}>
+              {trade.tradeDirection === 'long' ? 'Long' : 'Short'}
+            </span>
           </div>
           <button onClick={onClose} className="text-gray-400 hover:text-white">✕</button>
         </div>
@@ -574,15 +572,13 @@ export function TradesList({ trades, onBack, onDeleteTrade, type }) {
                       <div>
                         <h3 className="font-bold text-sm flex items-center gap-2">
                           {trade.asset}
-                          {trade.tradeDirection && (
-                            <span className={`text-xs px-2 py-0.5 rounded-full ${
-                              trade.tradeDirection === 'long' 
-                                ? 'bg-green-500/20 text-green-400' 
-                                : 'bg-red-500/20 text-red-400'
-                            }`}>
-                              {trade.tradeDirection === 'long' ? 'Long' : 'Short'}
-                            </span>
-                          )}
+                          <span className={`text-xs px-2 py-0.5 rounded-full ${
+                            trade.tradeDirection === 'long' 
+                              ? 'bg-green-500/20 text-green-400' 
+                              : 'bg-red-500/20 text-red-400'
+                          }`}>
+                            {trade.tradeDirection === 'long' ? 'Long' : 'Short'}
+                          </span>
                         </h3>
                         <p className="text-xs text-gray-400">{trade.date}</p>
                       </div>
