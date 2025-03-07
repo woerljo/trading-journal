@@ -13,7 +13,6 @@ const initialState = {
   tradeStartTime: "",
   tradeEndTime: "",
   asset: "",
-  tradeDirection: "long",
   entry: "",
   exit: "",
   stopLoss: "",
@@ -25,7 +24,7 @@ const initialState = {
   image: "",
   weeklyBias: "",
   dailyBias: "",
-  type: "realTime" // Wichtig: Typ des Trades festlegen
+  type: "realTime"
 };
 
 export function RealTimeTrading({ onBack }) {
@@ -174,16 +173,6 @@ export function RealTimeTrading({ onBack }) {
             placeholder="z.B. EUR/USD"
             required
           />
-          <Select
-            label="Trade Richtung"
-            name="tradeDirection"
-            value={formData.tradeDirection}
-            onChange={handleChange}
-            required
-          >
-            <option value="long">Long</option>
-            <option value="short">Short</option>
-          </Select>
           <Input
             label="Entry Preis"
             type="number"
