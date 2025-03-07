@@ -74,6 +74,16 @@ function TradeModal({ trade, onClose, type }) {
             </div>
           </div>
 
+          {/* Neue Trade-Richtung Anzeige */}
+          {trade.tradeDirection && (
+            <div>
+              <p className="text-sm text-gray-400">Trade Richtung</p>
+              <p className={trade.tradeDirection === 'long' ? 'text-green-500' : 'text-red-500'}>
+                {trade.tradeDirection === 'long' ? 'Long' : 'Short'}
+              </p>
+            </div>
+          )}
+
           <div className="grid grid-cols-3 gap-4">
             <div>
               <p className="text-sm text-gray-400">Entry</p>
