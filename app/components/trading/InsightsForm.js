@@ -239,6 +239,30 @@ export function InsightsForm({ onBack }) {
                     </Button>
                   </div>
                 </div>
+
+                {deleteConfirm === insight._id && (
+                  <div className="absolute inset-0 bg-gray-900/95 flex items-center justify-center rounded-xl">
+                    <div className="text-center" onClick={e => e.stopPropagation()}>
+                      <p className="mb-4">Erkenntnis wirklich löschen?</p>
+                      <div className="flex gap-2 justify-center">
+                        <Button
+                          onClick={() => handleDelete(insight._id)}
+                          variant="danger"
+                          className="!px-4 !py-1"
+                        >
+                          Ja
+                        </Button>
+                        <Button
+                          onClick={() => setDeleteConfirm(null)}
+                          variant="secondary"
+                          className="!px-4 !py-1"
+                        >
+                          Nein
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+                )}
               </motion.div>
             ))}
           </div>
