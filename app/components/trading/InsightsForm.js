@@ -110,36 +110,24 @@ export function InsightsForm({ onBack }) {
           className="bg-gray-800 rounded-xl max-w-2xl w-full p-6 shadow-2xl"
           onClick={e => e.stopPropagation()}
         >
-          <div className="flex justify-between items-start mb-4">
-            <div>
-              <h3 className="text-xl font-bold">{insight.title}</h3>
-              <div className="flex items-center gap-2 flex-wrap">
-                {insight.category.map(cat => (
-                  <span 
-                    key={cat}
-                    className="px-2 py-0.5 rounded-full bg-blue-500/20 text-blue-400 text-xs"
-                  >
-                    {cat}
-                  </span>
-                ))}
-                <span className="text-xs text-gray-400">{insight.date}</span>
-              </div>
-            </div>
-            <button onClick={onClose} className="text-gray-400 hover:text-white">✕</button>
-          </div>
-
-          <div className="space-y-4">
+          <div className="flex flex-col gap-3">
+            <h3 className="text-xl font-bold">{insight.title}</h3>
+            <p className="text-sm text-gray-400">{insight.date}</p>
             <div className="flex flex-wrap gap-2">
               {insight.category.map(cat => (
                 <span 
                   key={cat}
-                  className="px-2 py-1 rounded-full bg-blue-500/20 text-blue-400 text-xs"
+                  className="px-2 py-1 rounded-lg text-sm
+                    bg-blue-500/10 text-blue-400 border border-blue-500/30
+                    shadow-sm shadow-blue-500/10"
                 >
                   {cat}
                 </span>
               ))}
             </div>
+          </div>
 
+          <div className="space-y-4">
             <p className="text-gray-100 whitespace-pre-wrap">{insight.text}</p>
 
             {insight.image && (
@@ -231,16 +219,20 @@ export function InsightsForm({ onBack }) {
                 onClick={() => setSelectedInsight(insight)}
               >
                 <div className="flex flex-col gap-2">
-                  <div className="flex items-center gap-2 flex-wrap">
+                  <p className="text-xs text-gray-400 border-b border-gray-700/50 pb-2">
+                    {insight.date}
+                  </p>
+                  <div className="flex flex-wrap gap-2">
                     {insight.category.map(cat => (
                       <span 
                         key={cat}
-                        className="px-2 py-0.5 rounded-full bg-blue-500/20 text-blue-400 text-xs"
+                        className="px-2 py-0.5 rounded-lg text-xs
+                          bg-blue-500/10 text-blue-400 border border-blue-500/30
+                          shadow-sm shadow-blue-500/10"
                       >
                         {cat}
                       </span>
                     ))}
-                    <span className="text-xs text-gray-400">{insight.date}</span>
                   </div>
                   <h3 className="font-semibold text-white group-hover:text-blue-400 transition-colors">
                     {insight.title}
