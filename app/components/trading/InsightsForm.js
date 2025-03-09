@@ -147,7 +147,9 @@ export function InsightsForm({ onBack }) {
 
   const filteredInsights = insights.filter(insight => {
     if (selectedCategories.includes('all')) return true;
-    return selectedCategories.includes(insight.category);
+    return selectedCategories.some(selectedCat => 
+      insight.category.includes(selectedCat)
+    );
   });
 
   if (showSaved) {
