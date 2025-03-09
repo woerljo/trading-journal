@@ -202,19 +202,31 @@ export function InsightsForm({ onBack }) {
             ))}
           </div>
 
-          <div className="grid grid-cols-1 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {filteredInsights.map((insight) => (
               <motion.div
                 key={insight._id}
-                className="bg-gray-800/50 backdrop-blur-lg rounded-xl p-4 shadow-lg relative group"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -20 }}
+                className="bg-gray-800/50 rounded-xl p-4 group relative hover:bg-gray-800/80 
+                  transition-colors cursor-pointer border border-gray-700/50 hover:border-blue-500/50"
+                onClick={() => setSelectedInsight(insight)}
               >
-                <div className="flex justify-between items-start mb-2">
-                  <div>
-                    <h3 className="font-bold text-lg">{insight.title}</h3>
-                    <p className="text-xs text-gray-400 mb-1">{insight.date}</p>
-                    <p className="text-sm text-gray-300">{insight.category}</p>
-                  </div>
+                <div className="flex flex-col gap-2">
                   <div className="flex items-center gap-2">
+                    <span className="px-2 py-0.5 rounded-full bg-blue-500/20 text-blue-400 text-xs">
+                      {insight.category}
+                    </span>
+                    <span className="text-xs text-gray-400">{insight.date}</span>
+                  </div>
+                  <h3 className="font-semibold text-white group-hover:text-blue-400 transition-colors">
+                    {insight.title}
+                  </h3>
+                  <div className="flex justify-between items-center mt-1">
+                    <span className="text-xs text-gray-400">
+                      {insight.image ? '📷 ' : ''}{insight.text.slice(0, 30)}...
+                    </span>
                     <Button
                       onClick={(e) => {
                         e.stopPropagation();
@@ -227,36 +239,6 @@ export function InsightsForm({ onBack }) {
                     </Button>
                   </div>
                 </div>
-
-                {deleteConfirm === insight._id && (
-                  <div className="absolute inset-0 bg-gray-900/95 flex items-center justify-center rounded-xl">
-                    <div className="text-center">
-                      <p className="mb-4">Erkenntnis wirklich löschen?</p>
-                      <div className="flex gap-2 justify-center">
-                        <Button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleDelete(insight._id);
-                          }}
-                          variant="danger"
-                          className="!px-4 !py-1"
-                        >
-                          Ja
-                        </Button>
-                        <Button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setDeleteConfirm(null);
-                          }}
-                          variant="secondary"
-                          className="!px-4 !py-1"
-                        >
-                          Nein
-                        </Button>
-                      </div>
-                    </div>
-                  </div>
-                )}
               </motion.div>
             ))}
           </div>
