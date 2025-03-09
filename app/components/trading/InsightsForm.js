@@ -5,6 +5,7 @@ import { Button } from '../ui/Button';
 import { PageContainer } from '../ui/PageContainer';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Select } from '../ui/Select';
+import { Input } from '../ui/Input';
 
 const CATEGORIES = [
   { value: 'Psychologie', label: 'Psychologie' },
@@ -18,9 +19,10 @@ export function InsightsForm({ onBack }) {
   const [formData, setFormData] = useState({
     title: '',
     text: '',
+    date: new Date().toISOString().split('T')[0],
     category: '',
     image: '',
-    date: new Date().toISOString().split('T')[0]
+    type: 'insight'
   });
 
   const { saveInsight, fetchInsights, deleteInsight, isLoading, error } = useInsightApi();
@@ -70,9 +72,10 @@ export function InsightsForm({ onBack }) {
       setFormData({
         title: '',
         text: '',
+        date: new Date().toISOString().split('T')[0],
         category: '',
         image: '',
-        date: new Date().toISOString().split('T')[0]
+        type: 'insight'
       });
       setSaveSuccess(true);
       loadInsights();
@@ -108,17 +111,17 @@ export function InsightsForm({ onBack }) {
           onClick={e => e.stopPropagation()}
         >
           <div className="flex justify-between items-start mb-4">
-            <h3 className="text-xl font-bold">{insight.title}</h3>
+            <div>
+              <h3 className="text-xl font-bold">{insight.title}</h3>
+              <p className="text-sm text-gray-400">{insight.date}</p>
+            </div>
             <button onClick={onClose} className="text-gray-400 hover:text-white">✕</button>
           </div>
 
           <div className="space-y-4">
-            <div className="flex items-center gap-3">
-              <span className="text-sm text-gray-400">{insight.date}</span>
-              <span className="px-2 py-1 rounded-full bg-blue-500/20 text-blue-400 text-xs">
-                {insight.category}
-              </span>
-            </div>
+            <span className="px-2 py-1 rounded-full bg-blue-500/20 text-blue-400 text-xs">
+              {insight.category}
+            </span>
 
             <p className="text-gray-100 whitespace-pre-wrap">{insight.text}</p>
 
@@ -199,81 +202,63 @@ export function InsightsForm({ onBack }) {
             ))}
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {filteredInsights.length === 0 ? (
-              <p className="text-center text-gray-400 py-8 col-span-full">
-                Keine Erkenntnisse in dieser Kategorie
-              </p>
-            ) : (
-              filteredInsights.map((insight) => (
-                <motion.div
-                  key={insight._id}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -20 }}
-                  className="bg-gray-800/50 rounded-xl p-4 group relative hover:bg-gray-800/80 
-                    transition-colors cursor-pointer border border-gray-700/50 hover:border-blue-500/50"
-                  onClick={() => setSelectedInsight(insight)}
-                >
-                  <div className="flex flex-col gap-2">
-                    <div className="flex items-center gap-2">
-                      <span className="px-2 py-0.5 rounded-full bg-blue-500/20 text-blue-400 text-xs">
-                        {insight.category}
-                      </span>
-                      <span className="text-xs text-gray-400">{insight.date}</span>
-                    </div>
-                    <h3 className="font-semibold text-white group-hover:text-blue-400 transition-colors">
-                      {insight.title}
-                    </h3>
-                    <div className="flex justify-between items-center mt-1">
-                      <span className="text-xs text-gray-400">
-                        {insight.image ? '📷 ' : ''}{insight.text.slice(0, 30)}...
-                      </span>
-                      <Button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setDeleteConfirm(insight._id);
-                        }}
-                        variant="danger"
-                        className="opacity-0 group-hover:opacity-100 transition-opacity !px-2 !py-1 text-xs"
-                      >
-                        🗑️
-                      </Button>
-                    </div>
+          <div className="grid grid-cols-1 gap-4">
+            {filteredInsights.map((insight) => (
+              <motion.div
+                key={insight._id}
+                className="bg-gray-800/50 backdrop-blur-lg rounded-xl p-4 shadow-lg relative group"
+              >
+                <div className="flex justify-between items-start mb-2">
+                  <div>
+                    <h3 className="font-bold text-lg">{insight.title}</h3>
+                    <p className="text-xs text-gray-400 mb-1">{insight.date}</p>
+                    <p className="text-sm text-gray-300">{insight.category}</p>
                   </div>
+                  <div className="flex items-center gap-2">
+                    <Button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setDeleteConfirm(insight._id);
+                      }}
+                      variant="danger"
+                      className="opacity-0 group-hover:opacity-100 transition-opacity !px-2 !py-1 text-xs"
+                    >
+                      🗑️
+                    </Button>
+                  </div>
+                </div>
 
-                  {deleteConfirm === insight._id && (
-                    <div className="absolute inset-0 bg-gray-900/95 flex items-center justify-center rounded-xl">
-                      <div className="text-center">
-                        <p className="mb-4">Erkenntnis wirklich löschen?</p>
-                        <div className="flex gap-2 justify-center">
-                          <Button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleDelete(insight._id);
-                            }}
-                            variant="danger"
-                            className="!px-4 !py-1"
-                          >
-                            Ja
-                          </Button>
-                          <Button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              setDeleteConfirm(null);
-                            }}
-                            variant="secondary"
-                            className="!px-4 !py-1"
-                          >
-                            Nein
-                          </Button>
-                        </div>
+                {deleteConfirm === insight._id && (
+                  <div className="absolute inset-0 bg-gray-900/95 flex items-center justify-center rounded-xl">
+                    <div className="text-center">
+                      <p className="mb-4">Erkenntnis wirklich löschen?</p>
+                      <div className="flex gap-2 justify-center">
+                        <Button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleDelete(insight._id);
+                          }}
+                          variant="danger"
+                          className="!px-4 !py-1"
+                        >
+                          Ja
+                        </Button>
+                        <Button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setDeleteConfirm(null);
+                          }}
+                          variant="secondary"
+                          className="!px-4 !py-1"
+                        >
+                          Nein
+                        </Button>
                       </div>
                     </div>
-                  )}
-                </motion.div>
-              ))
-            )}
+                  </div>
+                )}
+              </motion.div>
+            ))}
           </div>
 
           <AnimatePresence>
@@ -343,19 +328,29 @@ export function InsightsForm({ onBack }) {
               required
             />
 
-            <Select
-              value={formData.category}
-              onChange={handleChange}
-              name="category"
-              required
-            >
-              <option value="" className="bg-gray-900">Kategorie wählen</option>
-              {CATEGORIES.map(cat => (
-                <option key={cat.value} value={cat.value} className="bg-gray-900">
-                  {cat.label}
-                </option>
-              ))}
-            </Select>
+            <div className="grid grid-cols-2 gap-4">
+              <input
+                type="date"
+                value={formData.date}
+                onChange={handleChange}
+                name="date"
+                className="w-full p-3 rounded-lg bg-gray-900/50 border border-gray-700 text-white 
+                  focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none"
+                required
+              />
+
+              <Select
+                name="category"
+                value={formData.category}
+                onChange={handleChange}
+                required
+              >
+                <option value="">Kategorie wählen</option>
+                {CATEGORIES.map(cat => (
+                  <option key={cat.value} value={cat.value}>{cat.label}</option>
+                ))}
+              </Select>
+            </div>
 
             <textarea
               value={formData.text}
