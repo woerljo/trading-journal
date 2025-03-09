@@ -20,7 +20,7 @@ export function InsightsForm({ onBack }) {
     title: '',
     text: '',
     date: new Date().toISOString().split('T')[0],
-    category: '',
+    category: [],
     image: '',
     type: 'insight'
   });
@@ -73,7 +73,7 @@ export function InsightsForm({ onBack }) {
         title: '',
         text: '',
         date: new Date().toISOString().split('T')[0],
-        category: '',
+        category: [],
         image: '',
         type: 'insight'
       });
@@ -113,15 +113,32 @@ export function InsightsForm({ onBack }) {
           <div className="flex justify-between items-start mb-4">
             <div>
               <h3 className="text-xl font-bold">{insight.title}</h3>
-              <p className="text-sm text-gray-400">{insight.date}</p>
+              <div className="flex items-center gap-2 flex-wrap">
+                {insight.category.map(cat => (
+                  <span 
+                    key={cat}
+                    className="px-2 py-0.5 rounded-full bg-blue-500/20 text-blue-400 text-xs"
+                  >
+                    {cat}
+                  </span>
+                ))}
+                <span className="text-xs text-gray-400">{insight.date}</span>
+              </div>
             </div>
             <button onClick={onClose} className="text-gray-400 hover:text-white">✕</button>
           </div>
 
           <div className="space-y-4">
-            <span className="px-2 py-1 rounded-full bg-blue-500/20 text-blue-400 text-xs">
-              {insight.category}
-            </span>
+            <div className="flex flex-wrap gap-2">
+              {insight.category.map(cat => (
+                <span 
+                  key={cat}
+                  className="px-2 py-1 rounded-full bg-blue-500/20 text-blue-400 text-xs"
+                >
+                  {cat}
+                </span>
+              ))}
+            </div>
 
             <p className="text-gray-100 whitespace-pre-wrap">{insight.text}</p>
 
@@ -214,10 +231,15 @@ export function InsightsForm({ onBack }) {
                 onClick={() => setSelectedInsight(insight)}
               >
                 <div className="flex flex-col gap-2">
-                  <div className="flex items-center gap-2">
-                    <span className="px-2 py-0.5 rounded-full bg-blue-500/20 text-blue-400 text-xs">
-                      {insight.category}
-                    </span>
+                  <div className="flex items-center gap-2 flex-wrap">
+                    {insight.category.map(cat => (
+                      <span 
+                        key={cat}
+                        className="px-2 py-0.5 rounded-full bg-blue-500/20 text-blue-400 text-xs"
+                      >
+                        {cat}
+                      </span>
+                    ))}
                     <span className="text-xs text-gray-400">{insight.date}</span>
                   </div>
                   <h3 className="font-semibold text-white group-hover:text-blue-400 transition-colors">
@@ -345,17 +367,38 @@ export function InsightsForm({ onBack }) {
                 required
               />
 
-              <Select
-                name="category"
-                value={formData.category}
-                onChange={handleChange}
-                required
-              >
-                <option value="">Kategorie wählen</option>
-                {CATEGORIES.map(cat => (
-                  <option key={cat.value} value={cat.value}>{cat.label}</option>
-                ))}
-              </Select>
+              <div className="space-y-2">
+                <label className="text-sm text-gray-400">Kategorien</label>
+                <div className="flex flex-wrap gap-2">
+                  {CATEGORIES.map(cat => (
+                    <label 
+                      key={cat.value}
+                      className={`px-3 py-1.5 rounded-lg text-sm cursor-pointer transition-colors
+                        ${formData.category.includes(cat.value) 
+                          ? 'bg-blue-500/20 text-blue-400 border border-blue-500/50' 
+                          : 'bg-gray-800/50 text-gray-400 hover:bg-gray-700/50 border border-transparent'
+                        }`}
+                    >
+                      <input
+                        type="checkbox"
+                        value={cat.value}
+                        checked={formData.category.includes(cat.value)}
+                        onChange={(e) => {
+                          const value = e.target.value;
+                          setFormData(prev => ({
+                            ...prev,
+                            category: e.target.checked
+                              ? [...prev.category, value]
+                              : prev.category.filter(c => c !== value)
+                          }));
+                        }}
+                        className="sr-only"
+                      />
+                      <span>{cat.label}</span>
+                    </label>
+                  ))}
+                </div>
+              </div>
             </div>
 
             <textarea
